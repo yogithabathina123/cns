@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char mat[5][5];
+
+void makeMatrix(char key[])
+{
+    int used[26] = {0}, r = 0, c = 0, i;
+    char ch;
+
+    used['J' - 'A'] = 1;
+
+    for(i = 0; key[i]; i++)
+    {
+        ch = toupper(key[i]);
+        if(ch == 'J') ch = 'I';
+
+        if(ch >= 'A' && ch <= 'Z' && !used[ch-'A'])
+        {
+            mat[r][c++] = ch;
+            used[ch-'A'] = 1;
+            if(c == 5) c = 0, r++;
+        }
+    }
+
+    for(ch = 'A'; ch <= 'Z'; ch++)
+    {
+        if(!used[ch-'A'])
+        {
+            mat[r][c++] = ch;
+            used[ch-'A'] = 1;
+            if(c == 5) c = 0, r++;
+        }
+    }
+}
+
+void find(char ch, int *r, int *c)
+{
+    int i, j;
+    if(ch == 'J') ch = 'I';
+
+    for(i = 0; i < 5; i++)
+        for(j = 0; j < 5; j++)
+            if(mat[i][j] == ch)
+            {
+                *r = i;
+                *c = j;
+                return;
+            }
+}
+
+int main()
+{
+    char key[50], text[100], p[200] = "", out[200] = "";
+    int i, n = 0, r1, c1, r2, c2;
+
+    printf("Enter keyword: ");
+    scanf("%s", key);
+
+    makeMatrix(key);
+
+    printf("\nPlayfair Matrix:\n");
+    for(i = 0; i < 5; i++)
+        printf("%c %c %c %c %c\n",
+               mat[i][0], mat[i][1], mat[i][2],
+               mat[i][3], mat[i][4]);
+
+    printf("\nEnter plaintext: ");
+    scanf("%s", text);
+
+    for(i = 0; text[i]; i++)
+        if(isalpha(text[i]))
+        {
+            char ch = toupper(text[i]);
+            if(ch == 'J') ch = 'I';
+            p[n++] = ch;
+        }
+
+    if(n % 2) p[n++] = 'X';
+
+    for(i = 0; i < n; i += 2)
+    {
+        if(p[i] == p[i+1])
+        {
+            p[i+1] = 'X';
+            n++;
+            for(int j = n-1; j > i+1; j--)
+                p[j] = p[j-1];
+        }
+
+        find(p[i], &r1, &c1);
+        find(p[i+1], &r2, &c2);
+
+        if(r1 == r2)
+        {
+            out[i] = mat[r1][(c1+1)%5];
+            out[i+1] = mat[r2][(c2+1)%5];
+        }
+        else if(c1 == c2)
+        {
+            out[i] = mat[(r1+1)%5][c1];
+            out[i+1] = mat[(r2+1)%5][c2];
+        }
+        else
+        {
+            out[i] = mat[r1][c2];
+            out[i+1] = mat[r2][c1];
+        }
+    }
+
+    out[n] = '\0';
+    printf("Cipher text: %s\n", out);
+
+    return 0;
+}
