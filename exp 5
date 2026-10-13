@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <ctype.h>
+
+int gcd(int a,int b)
+{
+	while(b)
+	{
+		int t=b;
+		b=a%b;
+		a=t;
+	}
+	return a;
+}
+
+int main()
+{
+	char text[100];
+	int a,b,i,p;
+	
+	printf("enter plaintext:");
+	fgets(text,100,stdin);
+	
+	printf("enter a:");
+	scanf("%d",&a);
+	
+	printf("enter b:");
+	scanf("%d",&b);
+	
+	if(gcd(a,26)!=1)
+	{
+		printf("invalid value of a! gcd(a,26) must be 1.\n");
+		return 0;
+	}
+	for(i=0;text[i] !='\0';i++)
+	{
+		if(isalpha(text[i]))
+		{
+			p=toupper(text[i]-'A');
+			text[i]=(a*p+b)%26+'A';
+		}
+	}
+	 printf("cipher text: %s", text);
+	 
+	 return 0;
+}
